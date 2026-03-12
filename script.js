@@ -11,13 +11,9 @@ const nameInputContainer = document.getElementById('name-input-container');
 const usernameInput = document.getElementById('username-input');
 const btnSetName = document.getElementById('btn-set-name');
 
-// Simple room name for friends to connect
 const ROOM_NAME = 'antipode-friends';
-
-// User's own name
 let myUsername = '';
 
-// 1. Get User Location (Optional - just for fun)
 btnLocate.addEventListener('click', () => {
     step1.classList.add('hidden');
     step2.classList.remove('hidden');
@@ -32,21 +28,18 @@ function success(position) {
     searchText.innerText = `Connecting to friends...`;
 
     setTimeout(() => {
-        // Update UI
         partnerLoc.innerText = `Location: Connected to Friends Room`;
         partnerDist.innerText = `Status: Ready to Chat!`;
 
         step2.classList.add('hidden');
         step3.classList.remove('hidden');
 
-        // Join the shared room
         socket.emit('join_room', ROOM_NAME);
 
-    }, 1500); // 1.5 second delay
+    }, 1500);
 }
 
 function error() {
-    // If location fails, still connect
     searchText.innerText = `Connecting to friends...`;
     setTimeout(() => {
         partnerLoc.innerText = `Location: Connected to Friends Room`;
@@ -57,7 +50,6 @@ function error() {
     }, 1500);
 }
 
-// Set Name Button
 btnSetName.addEventListener('click', () => {
     const name = usernameInput.value.trim();
     if (name.length > 0) {
@@ -69,7 +61,6 @@ btnSetName.addEventListener('click', () => {
     }
 });
 
-// 4. Chat Logic
 const chatBox = document.getElementById('chat-box');
 const input = document.getElementById('message-input');
 const btnSend = document.getElementById('btn-send');
@@ -97,12 +88,10 @@ input.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
-// Listen for incoming messages
 socket.on('chat_message', (msg) => {
     appendMessage('them', msg);
 });
 
-// Listen for user list updates
 socket.on('user_list', (users) => {
     if (userListDiv) {
         userListDiv.innerHTML = '';
@@ -115,17 +104,14 @@ socket.on('user_list', (users) => {
     }
 });
 
-// Listen for user join
 socket.on('user_joined', (user) => {
     appendMessage('system', `${user} joined the chat!`);
 });
 
-// Listen for user leave
 socket.on('user_left', (user) => {
     appendMessage('system', `${user} left the chat!`);
 });
 
-// Listen for username confirmation
 socket.on('username_set', (username) => {
     myUsername = username;
     nameInputContainer.classList.add('hidden');
