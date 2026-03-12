@@ -1,60 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antipode - Connect Across the World</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts for Cozy Vibe -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Merriweather:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
-</head>
-<body>
+<!-- Name Input Section -->
+<div class="name-input-container" id="name-input-container">
+    <h3>👤 Enter Your Name</h3>
+    <input type="text" id="username-input" placeholder="Enter your name..." maxlength="20">
+    <button id="btn-set-name">Set Name</button>
+</div>
 
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <h1>Antipode</h1>
-            <p>Find your soulmate on the other side of the world.</p>
-        </header>
-
-        <!-- Step 1: Get Location -->
-        <div id="step-1" class="card">
-            <div class="globe-icon">🌍</div>
-            <h2>Where are you?</h2>
-            <p>We need your location to find the exact opposite point on Earth.</p>
-            <button id="btn-locate">Find My Antipode</button>
-            <p id="location-status" class="status-text"></p>
-        </div>
-
-        <!-- Step 2: Connecting -->
-        <div id="step-2" class="card hidden">
-            <div class="spinner"></div>
-            <h2>Searching the other side...</h2>
-            <p id="search-text">Calculating coordinates...</p>
-        </div>
-
-        <!-- Step 3: Chat Interface -->
-        <div id="step-3" class="card hidden">
-            <div class="match-info">
-                <h3>Connected!</h3>
-                <p id="partner-location">Location: Unknown</p>
-                <p id="partner-distance">Distance: Unknown</p>
-            </div>
-            
-            <div class="chat-box" id="chat-box">
-                <div class="message system">Welcome to the cozy corner of the world.</div>
-            </div>
-
-            <div class="input-area">
-                <input type="text" id="message-input" placeholder="Say hello...">
-                <button id="btn-send">Send</button>
-            </div>
-        </div>
+<!-- User List Section -->
+<div class="user-list-container" id="user-list-container">
+    <h3>👥 Online Users</h3>
+    <div id="user-list" class="user-list">
+        <div class="user-item">Loading...</div>
     </div>
+</div>
 
-    <!-- Socket.io Client Library -->
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://unpkg.com/geolib@3.3.3/dist/geolib.min.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+<!-- Chat Section -->
+<div class="chat-box" id="chat-box">
+    <div class="message system">Welcome to the cozy corner of the world.</div>
+</div>
