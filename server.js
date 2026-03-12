@@ -12,15 +12,37 @@ app.use(express.static(path.join(__dirname, '.')));
 // Shared room for friends
 const SHARED_ROOM = 'antipode-friends';
 
+// Track connected users with their names
+const users = new Map();
+
 io.on('connection', (socket) => {
     console.log('A user connected');
+
+    // Generate a random temporary username
+    const tempUsername = `User_${Math.floor(Math.random() * 1000)}`;
+    users.set(socket.id, { id: socket.id, name: tempUsername });
+
+    socket.on('set_username', (username) => {
+        // Update user's name
+        const user = users.get(socket.id);
+        if (user) {
+            user.name = username;
+            io.to(SHARED_ROOM).emit('user_list', Array.from(users.values()).map(u => u.name));
+        }
+    });
 
     socket.on('join_room', (room) => {
         socket.join(room);
         console.log(`User joined room: ${room}`);
         
-        // Send a system message to the room
-        io.to(room).emit('chat_message', 'Someone from the other side of the world has joined!');
+        // Send user list to all users
+        io.to(room).emit('user_list', Array.from(users.values()).map(u => u.name));
+        
+        // Notify others
+        const user = users.get(socket.id);
+        if (user) {
+            socket.to(room).emit('user_joined', user.name);
+        }
     });
 
     socket.on('chat_message', (msg) => {
@@ -29,6 +51,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
+        const user = users.get(socket.id);
+        if (user) {
+            users.delete(socket.id);
+            io.to(SHARED_ROOM).emit('user_list', Array.from(users.values()).map(u => u.name));
+            io.to(SHARED_ROOM).emit('user_left', user.name);
+        }
         console.log('User disconnected');
     });
 });
