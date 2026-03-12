@@ -1,4 +1,4 @@
-const socket = io(); // Connect to backend
+const socket = io();
 const btnLocate = document.getElementById('btn-locate');
 const step1 = document.getElementById('step-1');
 const step2 = document.getElementById('step-2');
@@ -7,13 +7,11 @@ const searchText = document.getElementById('search-text');
 const partnerLoc = document.getElementById('partner-location');
 const partnerDist = document.getElementById('partner-distance');
 
-// 1. Get User Location
-btnLocate.addEventListener('click', () => {
-    if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
-        return;
-    }
+// Simple room name for friends to connect
+const ROOM_NAME = 'antipode-friends';
 
+// 1. Get User Location (Optional - just for fun)
+btnLocate.addEventListener('click', () => {
     step1.classList.add('hidden');
     step2.classList.remove('hidden');
 
@@ -24,47 +22,32 @@ function success(position) {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
     
-    // 2. Calculate Antipode (Opposite side of earth)
-    // Formula: Lat' = -Lat, Lon' = Lon - 180 (if positive) or + 180 (if negative)
-    const antipodeLat = -lat;
-    const antipodeLon = lon > 0 ? lon - 180 : lon + 180;
+    searchText.innerText = `Connecting to friends...`;
 
-    searchText.innerText = `Calculating coordinates: ${antipodeLat.toFixed(4)}, ${antipodeLon.toFixed(4)}`;
-
-    // 3. Check if Ocean (Mock Logic for Prototype)
-    // In a real app, you would send these coords to a Geocoding API (like Google Maps)
-    // to see if it's land. Here we simulate a delay and a random "Land" match.
-    
     setTimeout(() => {
-        // Simulate finding a user
-        const mockPartner = {
-            lat: antipodeLat + (Math.random() * 0.5 - 0.25), // Slight offset
-            lon: antipodeLon + (Math.random() * 0.5 - 0.25),
-            name: "Traveler"
-        };
-
-        // Calculate distance between user and partner
-        const distance = geolib.getDistance(
-            { latitude: lat, longitude: lon },
-            { latitude: mockPartner.lat, longitude: mockPartner.lon }
-        );
-
         // Update UI
-        partnerLoc.innerText = `Location: Near ${mockPartner.lat.toFixed(2)}, ${mockPartner.lon.toFixed(2)}`;
-        partnerDist.innerText = `Distance: ${Math.round(distance / 1000)} km away`;
+        partnerLoc.innerText = `Location: Connected to Friends Room`;
+        partnerDist.innerText = `Status: Ready to Chat!`;
 
         step2.classList.add('hidden');
         step3.classList.remove('hidden');
 
-        // Join a specific room based on the antipode coordinates
-        const roomName = `antipode_${antipodeLat.toFixed(2)}_${antipodeLon.toFixed(2)}`;
-        socket.emit('join_room', roomName);
+        // Join the shared room
+        socket.emit('join_room', ROOM_NAME);
 
-    }, 1000); // 2 second delay for effect
+    }, 1500); // 1.5 second delay
 }
 
 function error() {
-    alert("Unable to retrieve your location. Please enable GPS.");
+    // If location fails, still connect
+    searchText.innerText = `Connecting to friends...`;
+    setTimeout(() => {
+        partnerLoc.innerText = `Location: Connected to Friends Room`;
+        partnerDist.innerText = `Status: Ready to Chat!`;
+        step2.classList.add('hidden');
+        step3.classList.remove('hidden');
+        socket.emit('join_room', ROOM_NAME);
+    }, 1500);
 }
 
 // 4. Chat Logic
