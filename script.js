@@ -6,9 +6,16 @@ const step3 = document.getElementById('step-3');
 const searchText = document.getElementById('search-text');
 const partnerLoc = document.getElementById('partner-location');
 const partnerDist = document.getElementById('partner-distance');
+const userListDiv = document.getElementById('user-list');
+const nameInputContainer = document.getElementById('name-input-container');
+const usernameInput = document.getElementById('username-input');
+const btnSetName = document.getElementById('btn-set-name');
 
 // Simple room name for friends to connect
 const ROOM_NAME = 'antipode-friends';
+
+// User's own name
+let myUsername = '';
 
 // 1. Get User Location (Optional - just for fun)
 btnLocate.addEventListener('click', () => {
@@ -50,6 +57,18 @@ function error() {
     }, 1500);
 }
 
+// Set Name Button
+btnSetName.addEventListener('click', () => {
+    const name = usernameInput.value.trim();
+    if (name.length > 0) {
+        myUsername = name;
+        nameInputContainer.classList.add('hidden');
+        socket.emit('set_username', myUsername);
+    } else {
+        alert('Please enter a name!');
+    }
+});
+
 // 4. Chat Logic
 const chatBox = document.getElementById('chat-box');
 const input = document.getElementById('message-input');
@@ -81,4 +100,33 @@ input.addEventListener('keypress', (e) => {
 // Listen for incoming messages
 socket.on('chat_message', (msg) => {
     appendMessage('them', msg);
+});
+
+// Listen for user list updates
+socket.on('user_list', (users) => {
+    if (userListDiv) {
+        userListDiv.innerHTML = '';
+        users.forEach(user => {
+            const div = document.createElement('div');
+            div.classList.add('user-item');
+            div.innerHTML = `👤 ${user}`;
+            userListDiv.appendChild(div);
+        });
+    }
+});
+
+// Listen for user join
+socket.on('user_joined', (user) => {
+    appendMessage('system', `${user} joined the chat!`);
+});
+
+// Listen for user leave
+socket.on('user_left', (user) => {
+    appendMessage('system', `${user} left the chat!`);
+});
+
+// Listen for username confirmation
+socket.on('username_set', (username) => {
+    myUsername = username;
+    nameInputContainer.classList.add('hidden');
 });
